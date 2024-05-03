@@ -729,7 +729,6 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
 
     def depart_footnote_reference(self, node):
         content = node.astext()
-        print(content)
         self.add(f"](#ref{content})</sup>")
 
     @pushing_context
