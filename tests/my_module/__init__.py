@@ -32,7 +32,7 @@ def deprecated_function():
     pass
 
 
-def func1(param1: int):
+def func1(param1: int) -> int:
     """This is a function with a single parameter.
     Thanks to github.com/remiconnesson.
 
@@ -41,7 +41,7 @@ def func1(param1: int):
     pass
 
 
-def func2(param1: int, param2: int):
+def func2(param1: int, param2: int) -> str:
     """This is a function with two parameters.
 
     :param param1: This is the first parameter.

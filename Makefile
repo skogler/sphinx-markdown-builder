@@ -39,7 +39,6 @@ test-diff:
 
 	@# Copy just one file for verification
 	@cp "$(BUILD_DIR)/overrides/markdown/auto-summery.md" "$(BUILD_DIR)/markdown/overrides-auto-summery.md"
-	@rm -r $(BUILD_DIR)/markdown/_static $(BUILD_DIR)/markdown/permalink.html
 
 	@echo "Verifies outputs..."
 	@diff --recursive --color=always --side-by-side --text --suppress-common-lines \
@@ -61,7 +60,7 @@ lint:
 	@echo "Lint with flake8"
 	flake8 . --count --select=E,F,W,C --show-source \
 			--max-complexity=10 --max-line-length=120 --statistics \
-			--exclude "venv,.venv,.git"
+			--exclude "venv*,.venv,.git"
 	@ echo "Lint with pylint"
 	pylint sphinx_markdown_builder --disable C0116,C0115
 
