@@ -35,10 +35,12 @@ test-diff:
 	@echo "Building markdown with configuration overrides..."
 	@$(SPHINX_BUILD) -M markdown "$(SOURCE_DIR)" "$(BUILD_DIR)/overrides" $(SPHINX_OPTS) $(O) -a \
 			-D markdown_http_base="https://localhost" -D markdown_uri_doc_suffix=".html" \
-			-D markdown_docinfo=True -D markdown_anchor_sections=True -D markdown_anchor_signatures=True
+			-D markdown_docinfo=True -D markdown_anchor_sections=True -D markdown_anchor_signatures=True \
+			-D autodoc_typehints=signature
 
-	@# Copy just one file for verification
+	@# Copy just the files for verification
 	@cp "$(BUILD_DIR)/overrides/markdown/auto-summery.md" "$(BUILD_DIR)/markdown/overrides-auto-summery.md"
+	@cp "$(BUILD_DIR)/overrides/markdown/auto-module.md" "$(BUILD_DIR)/markdown/overrides-auto-module.md"
 
 	@echo "Verifies outputs..."
 	@diff --recursive --color=always --side-by-side --text --suppress-common-lines \

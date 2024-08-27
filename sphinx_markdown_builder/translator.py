@@ -599,6 +599,7 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
     #     desc_parameterlist
     #       desc_annotation
     #       desc_parameter
+    #     desc_returns
     #   desc_content
     #     field_list
     #       field
@@ -651,6 +652,9 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
     depart_field_list = _end_list
     visit_field = _start_list_item
     depart_field = _end_list_item
+
+    def visit_desc_returns(self, _node):
+        self.add(" → ")
 
     @pushing_context
     def visit_field_body(self, _node):
