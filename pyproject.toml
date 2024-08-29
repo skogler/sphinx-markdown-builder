@@ -34,7 +34,7 @@ requires-python = ">=3.7"
 dev = [
     "sphinx>=5.3.0", # For development, we need a higher version for the tests' outputs to be identical.
     "bumpver", "black", "isort", "flake8", "pylint", "pip-tools", "pytest", "pytest-cov", "coveralls",
-    "sphinx-needs", "sphinxcontrib-plantuml", "sphinxcontrib.httpdomain",
+    "sphinxcontrib-plantuml", "sphinxcontrib.httpdomain",
 ]
 
 [project.urls]
