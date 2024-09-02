@@ -54,6 +54,9 @@ own line number for commenting in reviews.
    Boldface is used for labels that are visible in the user interface. The UI
    text is surrounded by double asterisks. For example, **bold**.
 
+.. important::
+   This is an important message.
+
 Italics are rarely used. Text surrounded by single asterisks is rendered in
 *italics*.
 
