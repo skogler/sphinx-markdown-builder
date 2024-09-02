@@ -81,7 +81,6 @@ class ContextStatus:
     list_marker: Optional[ListMarker] = None  # Current list marker
     desc_type: Optional[str] = None  # Current descriptor type
     default_ref_internal: bool = False  # Current default for internal reference
-    footnote: bool = False  # Current warped in footnote
 
 
 class SubContext:
@@ -353,6 +352,32 @@ class MetaContext(NoLineBreakContext):
         if not content:
             return ""
         return f'<meta name="{escape_html_quote(self.name)}" content="{escape_html_quote(content)}"/>'
+
+
+class FootNoteContext(NoLineBreakContext):
+    def __init__(self, ids, names, params=SubContextParams(1, 1)):
+        super().__init__(" ", params)
+        self.ids = ids
+        self.names = names
+        self.label_body = SubContext()
+        self.is_label = False
+
+    @property
+    def content(self):
+        if self.is_label:
+            return self.label_body.content
+        return super().content
+
+    def visit_label(self):
+        self.is_label = True
+
+    def depart_label(self):
+        self.is_label = False
+
+    def make(self):
+        content = super().make()
+        label = self.label_body.make() or self.names
+        return f"* <a id='{self.ids}'>**[{label}]**</a> {content}"
 
 
 _ContextT = TypeVar("_ContextT", bound=SubContext)

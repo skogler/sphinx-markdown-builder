@@ -53,12 +53,12 @@ def func2(param1: int, param2: int) -> str:
 def func3(param1: int, param2: int):
     """This is a function with two parameters.
 
-    :param param1: This is the first parameter [1]_.
-    :param param2: This [2]_ is the second parameter.
+    :param param1: Alice [1]_.
+    :param param2: Bon [2]_.
 
     References
     ----------
-    .. [1] `Google <https://google.com>`_
-    .. [2] `Github <https://github.com>`_
+    .. [1] Alice is commonly used to describe the first actor.
+    .. [2] Bob is commonly used to describe the second actor.
     """
     pass
