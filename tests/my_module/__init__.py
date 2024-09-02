@@ -48,3 +48,17 @@ def func2(param1: int, param2: int) -> str:
     :param param2: This is the second parameter.
     """
     pass
+
+
+def func3(param1: int, param2: int):
+    """This is a function with two parameters.
+
+    :param param1: Alice [1]_.
+    :param param2: Bon [2]_.
+
+    References
+    ----------
+    .. [1] Alice is commonly used to describe the first actor.
+    .. [2] Bob is commonly used to describe the second actor.
+    """
+    pass

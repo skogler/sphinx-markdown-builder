@@ -48,6 +48,7 @@ from sphinx_markdown_builder.contexts import (
     TitleContext,
     UniqueString,
     WrappedContext,
+    FootNoteContext,
 )
 from sphinx_markdown_builder.escape import escape_html_quote, escape_markdown_chars
 
@@ -719,3 +720,40 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
 
     def depart_entry(self, _node):
         self.table_ctx.exit_entry()  # workaround pylint: disable=no-member
+
+    ################################################################################
+    # footnote
+    ################################################################################
+    # footnote_reference
+    # ...
+    # footnote
+    #   label
+    #   paragraph
+    ###############################################################################
+
+    @property
+    def footnote_ctx(self) -> FootNoteContext:
+        ctx = self.ctx
+        assert isinstance(ctx, FootNoteContext)
+        return ctx
+
+    @pushing_context
+    def visit_footnote_reference(self, node):
+        ref_id = node.get("refid", "")
+        self._push_context(WrappedContext("<sup>[", f"](#{ref_id})</sup>"))
+
+    @pushing_context
+    def visit_footnote(self, node):
+        ids = node.get("ids", "")
+        if isinstance(ids, (list, tuple)):
+            ids = ",".join(ids)
+        names = node.get("names", "")
+        if isinstance(names, (list, tuple)):
+            names = ",".join(names)
+        self._push_context(FootNoteContext(ids, names, params=SubContextParams(1, 1)))
+
+    def visit_label(self, _node):
+        self.footnote_ctx.visit_label()  # workaround pylint: disable=no-member
+
+    def depart_label(self, _node):
+        self.footnote_ctx.depart_label()  # workaround pylint: disable=no-member

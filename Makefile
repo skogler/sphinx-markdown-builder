@@ -22,7 +22,7 @@ clean:
 # Catch-all target: route all unknown targets to Sphinx using the new "make mode" option.
 # $(O) is meant as a shortcut for $(SPHINX_OPTS).
 doc-%:
-	@$(SPHINX_BUILD) -M $* "$(SOURCE_DIR)" "$(BUILD_DIR)" $(SPHINX_OPTS) $(O)
+	@$(SPHINX_BUILD) -M $* "$(SOURCE_DIR)" "$(BUILD_DIR)" $(SPHINX_OPTS) $(O) -a -t Partners
 
 
 docs: doc-markdown
