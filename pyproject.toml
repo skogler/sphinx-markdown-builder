@@ -64,9 +64,12 @@ push = false
 ]
 "tests/source/conf.py" = [
     "^version = \"{version}\"$",
-    "Copyright (c) 2023-YYYY, Liran Funaro.",
 ]
 "tests/expected/overrides-auto-summery.md" = [
+    "<meta name=\"version\" content=\"{version}\"/>",
+    "<meta name=\"copyright\" content=\"Copyright (c) 2023-YYYY, Liran Funaro.\"/>",
+]
+"tests/expected/overrides-auto-module.md" = [
     "<meta name=\"version\" content=\"{version}\"/>",
     "<meta name=\"copyright\" content=\"Copyright (c) 2023-YYYY, Liran Funaro.\"/>",
 ]
