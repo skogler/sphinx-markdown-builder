@@ -12,6 +12,7 @@ readme = "README.md"
 authors = [{ name = "Liran Funaro", email = "liran.funaro@gmail.com" }]
 license = { text = "MIT" }
 classifiers = [
+    "Framework :: Sphinx :: Extension",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
