@@ -762,8 +762,14 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
             names = ",".join(names)
         self._push_context(FootNoteContext(ids, names, params=SubContextParams(1, 1)))
 
-    def visit_label(self, _node):
-        self.footnote_ctx.visit_label()  # workaround pylint: disable=no-member
+    def visit_label(self, node):
+        try:
+            self.footnote_ctx.visit_label()  # workaround pylint: disable=no-member
+        except AssertionError:
+            self.unknown_visit(node)
 
-    def depart_label(self, _node):
-        self.footnote_ctx.depart_label()  # workaround pylint: disable=no-member
+    def depart_label(self, node):
+        try:
+            self.footnote_ctx.depart_label()  # workaround pylint: disable=no-member
+        except AssertionError:
+            self.unknown_visit(node)
