@@ -594,7 +594,7 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
     depart_enumerated_list = _end_list
 
     def visit_bullet_list(self, node):
-        self._start_list(node.attributes.get("bullet", "*"))
+        self._start_list(node.attributes.get("bullet", self.config.markdown_bullet))
 
     depart_bullet_list = _end_list
     visit_list_item = _start_list_item

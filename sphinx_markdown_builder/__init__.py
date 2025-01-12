@@ -10,8 +10,9 @@ __docformat__ = "reStructuredText"
 
 def setup(app):
     app.add_builder(MarkdownBuilder)
-    app.add_config_value("markdown_http_base", "", False)
-    app.add_config_value("markdown_uri_doc_suffix", ".md", False)
-    app.add_config_value("markdown_anchor_sections", False, False)
-    app.add_config_value("markdown_anchor_signatures", False, False)
-    app.add_config_value("markdown_docinfo", False, False)
+    app.add_config_value("markdown_http_base", "", "html")
+    app.add_config_value("markdown_uri_doc_suffix", ".md", "html")
+    app.add_config_value("markdown_anchor_sections", False, "html")
+    app.add_config_value("markdown_anchor_signatures", False, "html")
+    app.add_config_value("markdown_docinfo", False, "html")
+    app.add_config_value("markdown_bullet", "*", "html")
