@@ -1,6 +1,6 @@
 <meta name="author" content="Liran Funaro"/>
-<meta name="copyright" content="Copyright (c) 2023-2024, Liran Funaro."/>
-<meta name="version" content="0.6.7"/>
+<meta name="copyright" content="Copyright (c) 2023-2025, Liran Funaro."/>
+<meta name="version" content="0.6.8"/>
 
 <a id="auto-module"></a>
 
@@ -50,16 +50,16 @@ Thanks to github.com/remiconnesson.
 This is a function with two parameters.
 
 * **Parameters:**
-  * **param1** – This is the first parameter.
-  * **param2** – This is the second parameter.
+  - **param1** – This is the first parameter.
+  - **param2** – This is the second parameter.
 
 ### func3(param1: [int](https://docs.python.org/3/library/functions.html#int), param2: [int](https://docs.python.org/3/library/functions.html#int))
 
 This is a function with two parameters.
 
 * **Parameters:**
-  * **param1** – Alice <sup>[1](#id3)</sup>.
-  * **param2** – Bon <sup>[2](#id4)</sup>.
+  - **param1** – Alice <sup>[1](#id3)</sup>.
+  - **param2** – Bon <sup>[2](#id4)</sup>.
 
 <a id="references"></a>
 

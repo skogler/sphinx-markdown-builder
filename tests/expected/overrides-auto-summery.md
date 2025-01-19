@@ -1,6 +1,6 @@
 <meta name="author" content="Liran Funaro"/>
-<meta name="copyright" content="Copyright (c) 2023-2024, Liran Funaro."/>
-<meta name="version" content="0.6.7"/>
+<meta name="copyright" content="Copyright (c) 2023-2025, Liran Funaro."/>
+<meta name="version" content="0.6.8"/>
 
 <!-- Taken from https://github.com/FabianNiehaus/sphinx-markdown-builder-toctree-test -->
 <!-- Sphinx-Markdown-Builder TocTree Test documentation master file, created by

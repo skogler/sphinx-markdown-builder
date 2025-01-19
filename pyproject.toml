@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sphinx-markdown-builder"
-version = "0.6.7"
+version = "0.6.8"
 description = "A Sphinx extension to add markdown generation support."
 readme = "README.md"
 authors = [{ name = "Liran Funaro", email = "liran.funaro@gmail.com" }]
@@ -42,7 +42,7 @@ dev = [
 Homepage = "https://github.com/liran-funaro/sphinx-markdown-builder"
 
 [tool.bumpver]
-current_version = "0.6.7"
+current_version = "0.6.8"
 version_pattern = "MAJOR.MINOR.PATCH[-TAG]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
@@ -65,6 +65,7 @@ push = false
 ]
 "tests/source/conf.py" = [
     "^version = \"{version}\"$",
+    "copyright = \"Copyright (c) 2023-YYYY, Liran Funaro.\"",
 ]
 "tests/expected/overrides-auto-summery.md" = [
     "<meta name=\"version\" content=\"{version}\"/>",

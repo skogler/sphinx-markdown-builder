@@ -29,6 +29,8 @@ SOURCE_FLAGS = [
         "markdown_anchor_signatures=True",
         "-D",
         "autodoc_typehints=signature",
+        "-D",
+        "markdown_bullet=-",
     ],
 ]
 BUILD_PATH_OPTIONS = [BUILD_PATH, os.path.join(BUILD_PATH, "overrides")]
