@@ -248,8 +248,7 @@ Make sure to indent the paragraph under the directive.
    .. note::
      If you want to require an entrance exam for your course, you also create
      the exam in the course outline. Before you can create an exam, you must
-     set your course to require an entrance exam in Studio. For more
-     information, see :ref:`Require an Entrance Exam`.
+     set your course to require an entrance exam in Studio.
 
 To conditionalize more than a paragraph, use either the ``only:: Partners`` or
 the ``only:: Open_edX`` directive, and then use an ``include::`` directive

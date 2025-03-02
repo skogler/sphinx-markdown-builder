@@ -60,6 +60,7 @@ SKIP = UniqueString("skip")
 
 DOC_INFO_FIELDS = "author", "contact", "copyright", "date", "organization", "revision", "status", "version"
 
+# Defines context items, skip, or None (keep processing sub-tree).
 PREDEFINED_ELEMENTS: Dict[str, Union[PushContext, SKIP, None]] = dict(  # pylint: disable=use-dict-literal
     # Doctree elements for which Markdown element is <prefix><content><suffix>
     emphasis=ItalicContext,
@@ -107,6 +108,7 @@ PREDEFINED_ELEMENTS: Dict[str, Union[PushContext, SKIP, None]] = dict(  # pylint
     colspec=None,
     tgroup=None,
     figure=None,
+    desc_signature_line=None,
 )
 
 
@@ -605,12 +607,13 @@ class MarkdownTranslator(SphinxTranslator):  # pylint: disable=too-many-public-m
     ################################################################################
     # desc (desctype: {function, class, method, etc.)
     #   desc_signature
-    #     desc_name
-    #       desc_annotation (optional)
-    #     desc_parameterlist
-    #       desc_annotation
-    #       desc_parameter
-    #     desc_returns
+    #     desc_signature_line (optional nesting)
+    #         desc_name
+    #           desc_annotation (optional)
+    #         desc_parameterlist
+    #           desc_annotation
+    #           desc_parameter
+    #         desc_returns
     #   desc_content
     #     field_list
     #       field

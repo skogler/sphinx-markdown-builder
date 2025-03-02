@@ -51,3 +51,9 @@ Http domain directive
 ---------------------
 
 .. http:get:: /users/(int:user_id)/posts/(tag)
+
+
+C domain
+--------
+
+.. c:function:: PyObject *PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
