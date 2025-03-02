@@ -1,6 +1,6 @@
 # sphinx-markdown-builder
 
-[![Coverage Status](https://coveralls.io/repos/github/liran-funaro/sphinx-markdown-builder/badge.svg?branch=main)](https://coveralls.io/github/liran-funaro/sphinx-markdown-builder?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/liran-funaro/sphinx-markdown-builder/badge.svg?branch=main&cache-bust=1)](https://coveralls.io/github/liran-funaro/sphinx-markdown-builder?branch=main)
 
 A Sphinx extension to add markdown generation support.
 
