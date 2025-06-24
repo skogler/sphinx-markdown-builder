@@ -7,11 +7,18 @@ import sys
 import textwrap
 import typing
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Type, \
+    TypeVar, Union
 
 from tabulate import tabulate
 
-from sphinx_markdown_builder.escape import escape_html_quote
+from sphinx_markdown_builder.escape import escape_html_quote, escape_markdown_chars
+
+
+def _escape_markdown_cell_value(value: str) -> str:
+    value = escape_markdown_chars(value)
+    value = value.replace("\n", " ").replace("|", "\\|")
+    return value
 
 
 class UniqueString(str):
@@ -81,6 +88,7 @@ class ContextStatus:
     list_marker: Optional[ListMarker] = None  # Current list marker
     desc_type: Optional[str] = None  # Current descriptor type
     default_ref_internal: bool = False  # Current default for internal reference
+    in_code_block: bool = False  # Whether we're currently in a code block
 
 
 class SubContext:
@@ -158,11 +166,11 @@ class SubContext:
 
 class WrappedContext(SubContext):
     def __init__(
-        self,
-        prefix,
-        suffix: Optional[str] = None,
-        wrap_empty=False,
-        params=SubContextParams(),
+            self,
+            prefix,
+            suffix: Optional[str] = None,
+            wrap_empty=False,
+            params=SubContextParams(),
     ):  # pylint: disable=too-many-arguments
         super().__init__(params)
         self.prefix = prefix
@@ -183,15 +191,19 @@ class WrappedContext(SubContext):
         prefix_space, text, suffix_space = match.groups()
 
         # Markdown requires italic/bold/etc... to have a space before it if the edge character is not a letter.
-        if self.prefix in ["*", "_"] and not is_letter(text[0]) and len(prefix_space) == 0:
+        if self.prefix in ["*", "_"] and not is_letter(text[0]) and len(
+                prefix_space) == 0:
             prefix_space = SPACE
         return f"{prefix_space}{self.prefix}{text}{self.suffix}{suffix_space}"
 
 
 class CommaSeparatedContext(SubContext):
-    def __init__(self, sep: str = ", ", params=SubContextParams()):
+    def __init__(self, sep: str = ", ", params=SubContextParams(), prefix: str = "",
+                 suffix: str = "", ):
         super().__init__(params)
         self.sep = sep
+        self.prefix = prefix
+        self.suffix = suffix
         self.parameters: List[List[str]] = []
 
         self.is_parameter = False
@@ -211,7 +223,10 @@ class CommaSeparatedContext(SubContext):
 
     def make(self):
         ret = super().make()
-        return ret + self.sep.join(["".join(item) for item in self.parameters])
+        if len(self.parameters) == 0:
+            return ret + "()"
+        return ret + self.prefix + self.sep.join(["".join(item) for item in
+                                                  self.parameters]) + self.suffix
 
 
 class TableContext(SubContext):
@@ -289,12 +304,12 @@ class TableContext(SubContext):
 
 class IndentContext(SubContext):
     def __init__(
-        self,
-        prefix,
-        only_first=False,
-        support_multi_line_break=False,
-        empty=False,
-        params=SubContextParams(1, 1),
+            self,
+            prefix,
+            only_first=False,
+            support_multi_line_break=False,
+            empty=False,
+            params=SubContextParams(1, 1),
     ):
         super().__init__(params)
         self.support_multi_line_break = support_multi_line_break
@@ -311,7 +326,8 @@ class IndentContext(SubContext):
         content = super().make()
         if self.support_multi_line_break:
             content = replace_multi_line_break(content)
-        content = textwrap.indent(content, self.prefix, predicate=(lambda _: True) if self.empty else None)
+        content = textwrap.indent(content, self.prefix,
+                                  predicate=(lambda _: True) if self.empty else None)
         if self.first_prefix is None:
             return content
         return content.replace(self.prefix, self.first_prefix, 1)
@@ -388,11 +404,11 @@ DEFAULT_TRANSLATOR: Translator = lambda _node, _elem: {}
 
 class PushContext(Generic[_ContextT]):  # pylint: disable=too-few-public-methods
     def __init__(
-        self,
-        ctx: Type[_ContextT],
-        *args,
-        translator: Translator = DEFAULT_TRANSLATOR,
-        **kwargs,
+            self,
+            ctx: Type[_ContextT],
+            *args,
+            translator: Translator = DEFAULT_TRANSLATOR,
+            **kwargs,
     ):
         self.ctx = ctx
         self.translator = translator
@@ -412,3 +428,190 @@ DocInfoContext = PushContext(
     MetaContext,
     translator=lambda _node, elem: {"name": f"{elem}: "},
 )
+
+
+class PythonCodeBlockContext(SubContext):
+    def __init__(self, params=SubContextParams(1, 1)):
+        super().__init__(params)
+        self.is_first = True
+
+    def make(self):
+        content = super().make()
+        if self.is_first:
+            self.is_first = False
+            return f"```python\n{content}\n```"
+        return f"```\n{content}\n```"
+
+
+class GitBookHintContext(SubContext):
+    """Context for GitBook-style hint boxes."""
+
+    def __init__(self, style: str, params=SubContextParams(2, 2)):
+        super().__init__(params)
+        self.style = style
+
+    def make(self):
+        content = super().make().strip()
+        if not content:
+            return ""
+        return f"{{% hint style=\"{self.style}\" %}}\n{content}\n{{% endhint %}}"
+
+
+class GitBookContentRefContext(SubContext):
+    """Context for GitBook-style content references."""
+
+    def __init__(self, url: str, params=SubContextParams()):
+        super().__init__(params)
+        self.url = url
+
+    def make(self):
+        content = super().make().strip()
+        if not content:
+            content = "."
+        return f"{{% content-ref url=\"{self.url}\" %}}\n{content}\n{{% endcontent-ref %}}"
+
+
+class ParameterTableContext(SubContext):
+    """Context for parameter tables with Name, Type, Description, Default columns."""
+
+    def __init__(self, params=SubContextParams(2, 2)):
+        super().__init__(params)
+        self.parameters = []
+        self.current_param = None
+        self.in_field_name = False
+        self.in_field_body = False
+
+    def start_parameter(self, name: str):
+        """Start a new parameter entry."""
+        self.current_param = {
+            'name': name,
+            'type': '',
+            'description': '',
+            'default': ''
+        }
+
+    def add_type(self, type_info: str):
+        """Add type information to current parameter."""
+        if self.current_param:
+            self.current_param['type'] = type_info.strip()
+
+    def add_description(self, description: str):
+        """Add description to current parameter."""
+        if self.current_param:
+            self.current_param['description'] = description.strip()
+
+    def add_default(self, default: str):
+        """Add default value to current parameter."""
+        if self.current_param:
+            self.current_param['default'] = default.strip()
+
+    def finish_parameter(self):
+        """Finish current parameter and add to list."""
+        if self.current_param:
+            self.parameters.append(self.current_param)
+            self.current_param = None
+
+    def make(self):
+        if not self.parameters:
+            return ""
+
+        rows: list[tuple[str, ...]] = [("Name",
+                                        "Type",
+                                        "Description",
+                                        "Default",
+                                        )]
+        max_column_lengths = [
+            len(c) for c in rows[0]
+        ]
+        for param in self.parameters:
+            name = param['name'] or ''
+            type_info = param['type'] or ''
+            description = param['description'] or ''
+            default = param['default'] or ''
+
+            row = (name, type_info, description, default)
+            row = tuple(_escape_markdown_cell_value(c) for c in row)
+            rows.append(row)
+            max_column_lengths = [
+                max(max_column_lengths[i], len(rows[-1][i]))
+                for i in range(len(max_column_lengths))
+            ]
+
+        lines = []
+        for row_idx, row in enumerate(rows):
+            lines.append("| " + " | ".join(
+                [
+                    f"{cell:{max_column_lengths[i]}}"
+                    for i, cell in enumerate(row)
+                ]) + " |")
+            if row_idx == 0:
+                lines.append("| " + " | ".join("-" * max_column_lengths[i] for i in (
+                    range(len(max_column_lengths)))) + " |")
+
+        return '\n'.join(lines)
+
+
+class AttributeTableContext(SubContext):
+    """Context for attribute tables with Name, Type, Description columns."""
+
+    def __init__(self, params=SubContextParams(2, 2)):
+        super().__init__(params)
+        self.attributes = []
+        self.current_attr = None
+
+    def start_attribute(self, name: str):
+        """Start a new attribute entry."""
+        self.current_attr = {
+            'name': name,
+            'type': '',
+            'description': ''
+        }
+
+    def add_type(self, type_info: str):
+        """Add type information to current attribute."""
+        if self.current_attr:
+            self.current_attr['type'] = type_info.strip()
+
+    def add_description(self, description: str):
+        """Add description to current attribute."""
+        if self.current_attr:
+            self.current_attr['description'] = description.strip()
+
+    def finish_attribute(self):
+        """Finish current attribute and add to list."""
+        if self.current_attr:
+            self.attributes.append(self.current_attr)
+            self.current_attr = None
+
+    def make(self):
+        if not self.attributes:
+            return ""
+
+        rows: list[tuple[str, ...]] = [("Name", "Type", "Description")]
+        max_column_lengths = [len(c) for c in rows[0]]
+        
+        for attr in self.attributes:
+            name = attr['name'] or ''
+            type_info = attr['type'] or ''
+            description = attr['description'] or ''
+
+            row = (name, type_info, description)
+            row = tuple(_escape_markdown_cell_value(c) for c in row)
+            rows.append(row)
+            max_column_lengths = [
+                max(max_column_lengths[i], len(rows[-1][i]))
+                for i in range(len(max_column_lengths))
+            ]
+
+        lines = []
+        for row_idx, row in enumerate(rows):
+            lines.append("| " + " | ".join(
+                [
+                    f"{cell:{max_column_lengths[i]}}"
+                    for i, cell in enumerate(row)
+                ]) + " |")
+            if row_idx == 0:
+                lines.append("| " + " | ".join("-" * max_column_lengths[i] for i in (
+                    range(len(max_column_lengths)))) + " |")
+
+        return '\n'.join(lines)
